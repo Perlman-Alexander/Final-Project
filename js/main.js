@@ -4,6 +4,8 @@ var uniforms, attributes, material;
 var start;
 var cube;
 
+
+
 window.addEventListener('load', function()
 {
 	container = document.getElementById("container");
@@ -21,30 +23,32 @@ window.addEventListener('load', function()
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
 
-	//material = new THREE.MeshBasicMaterial({color: 0xb7ff00, wireframe: true});
-	material = new THREE.ShaderMaterial({
-		uniforms:{
-			time:{ type: "f", value: 1.0},
-			resolution: { type: "v2", value: new THREE.Vector2()}
-		},
-		attributes:{
-			vertexOpacity:{ type: 'f', value: [] }
-		},
-		vertexShader: document.getElementById('vertexShader').textContent,
-		fragmentShader: document.getElementById('fragmentShader').textContent,
-		side: THREE.DoubleSide
-	});
-	start = Date.now();
+	var particleCount = 2000;
+	var particlesGeometry = new THREE.Geometry();
+	var particleMaterial = new THREE.PointCloudMaterial({color: 0x555555, size: 20});
+	for (var p = 0; p < particleCount; p++) {
+		var px = Math.random()*500 - 250;
+		var py = Math.random()*500 - 250;
+		var pz = Math.random()*500 - 250;
+		var particle = new THREE.Vector3(px, py, pz);
+		particlesGeometry.vertices.push(particle);
 
-	cube = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 7), material);
-	scene.add(cube);
 
+	}
+
+	var cloud = new THREE.PointCloud( particlesGeometry, particleMaterial );
+	scene.add(cloud);
+	// // var particleSystem = new THREE.Geometry(particles, particleMaterial);
+	// var particles = new THREE.PointCloudMaterial(particlesGeometry, particleMaterial);
+	// scene.add(particles);
 	render();
 });
 
+
+
 function render()
 {
-	material.uniforms['time'].value = 0.00025 * Date.now() - start;
+	// material.uniforms['time'].value = 0.00025 * Date.now() - start;
 	requestAnimationFrame(render);
 	//animation();
 	renderer.render(scene, camera);
