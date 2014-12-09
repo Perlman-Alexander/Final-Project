@@ -3,7 +3,7 @@ var scene, camera, controls, renderer;
 var uniforms, attributes, material;
 var start;
 var cube;
-
+var time = 0;
 
 
 window.addEventListener('load', function()
@@ -25,7 +25,6 @@ window.addEventListener('load', function()
 
 	var particleCount = 2000;
 	var particlesGeometry = new THREE.Geometry();
-	var particleMaterial = new THREE.PointCloudMaterial({color: 0x555555, size: 20});
 	for (var p = 0; p < particleCount; p++) {
 		var px = Math.random()*500 - 250;
 		var py = Math.random()*500 - 250;
@@ -33,23 +32,46 @@ window.addEventListener('load', function()
 		var particle = new THREE.Vector3(px, py, pz);
 		particlesGeometry.vertices.push(particle);
 
-
 	}
 
-	var cloud = new THREE.PointCloud( particlesGeometry, particleMaterial );
-	scene.add(cloud);
+	var colors = [0xffa22b, 0xe87727, 0xff6d37, 0xe83f27, 0xff2b3b];
+	for (var i = 0; i < colors.length; i++) {
+		var particleMaterial = new THREE.PointCloudMaterial({color: colors[i], size: 20});
+		var cloud = new THREE.PointCloud( particlesGeometry, particleMaterial );
+		scene.add(cloud);
+	}
+
+	
 	// // var particleSystem = new THREE.Geometry(particles, particleMaterial);
 	// var particles = new THREE.PointCloudMaterial(particlesGeometry, particleMaterial);
 	// scene.add(particles);
 	render();
 });
 
-
+function animation() {
+	time++;
+	for (var i = 0; i < scene.children.length; i++) {
+		var object = scene.children[i];
+		if (object instanceof THREE.PointCloud) {
+			object.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));
+		}
+	}
+}
 
 function render()
 {
 	// material.uniforms['time'].value = 0.00025 * Date.now() - start;
 	requestAnimationFrame(render);
-	//animation();
+	animation();
 	renderer.render(scene, camera);
 };
+
+
+/*
+Colors
+ffa22b
+e87727
+ff6d37
+e83f27
+ff2b3b
+*/
