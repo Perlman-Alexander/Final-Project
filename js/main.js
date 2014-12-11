@@ -18,7 +18,7 @@ window.addEventListener('load', function()
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.01, 100000);
-	camera.position.set(0, 0, -600);
+	camera.position.set(0, 0, -2);
 	camera.aspect = 2;
 	camera.lookAt(scene.position);
 	scene.add(camera);
@@ -31,7 +31,7 @@ window.addEventListener('load', function()
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
 	container.onmousemove=onDocumentMouseMove;
-
+/*
 	var mesh = new THREE.Mesh(new THREE.BoxGeometry(500, 200, 500), new THREE.MeshNormalMaterial());
 	var boundingBox = new THREE.BoxHelper(mesh);
 	boundingBox.material.color.setHex(0xFFFFFF);
@@ -64,6 +64,27 @@ window.addEventListener('load', function()
 		scene.add(cloud[i]);
 		console.log(cloud[i]);
 	}
+	*/
+	var verticesOfCube = [
+    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+	];
+
+	var indicesOfFaces = [
+	    2,1,0,    0,3,2,
+	    0,4,7,    7,3,0,
+	    0,1,5,    5,4,0,
+	    1,2,6,    6,5,1,
+	    2,3,7,    7,6,2,
+	    4,5,6,    6,7,4
+	];
+
+	//var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 1, 5 );
+	var geometry = new THREE.BoxGeometry(1,1,1,100,100,100);
+	var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+	mesh.material.wireframe = true;
+	mesh.material.color.set(0xffffff);
+	scene.add(mesh);
 	render();
 });
 
@@ -126,7 +147,7 @@ function mouseRay() {
 function render()
 {
 	requestAnimationFrame(render);
-	animation();
+	//animation();
 	renderer.render(scene, camera);
 };
 
