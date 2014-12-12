@@ -11,14 +11,15 @@ var time = 0;
 var mouse2d;
 var intersectingCloud = false;
 var cloud = [];
+var mesh, uniforms, attributes;
 
 window.addEventListener('load', function()
 {
 	container = document.getElementById("container");
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.01, 100000);
-	camera.position.set(0, 0, -2);
+	camera = new THREE.PerspectiveCamera(45 , window.innerWidth / window.innerHeight, 0.01, 100000);
+	camera.position.set(0, 0, -1400);
 	camera.aspect = 2;
 	camera.lookAt(scene.position);
 	scene.add(camera);
@@ -31,90 +32,83 @@ window.addEventListener('load', function()
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
 	container.onmousemove=onDocumentMouseMove;
-/*
-	var mesh = new THREE.Mesh(new THREE.BoxGeometry(500, 200, 500), new THREE.MeshNormalMaterial());
-	var boundingBox = new THREE.BoxHelper(mesh);
+
+	var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(500, 200, 500), new THREE.MeshNormalMaterial());
+	var boundingBox = new THREE.BoxHelper(mesh2);
 	boundingBox.material.color.setHex(0xFFFFFF);
 	scene.add(boundingBox);
 
-	var allclouds = [];
+	var particleCount = 500000;
+	var particlesGeometry = new THREE.Geometry();
+	for (var p = 0; p < particleCount; p++) {
+		var px, py, pz;
+		var vec;
+		px = Math.random()* 500 - 250;
+		py = Math.random()* 200 - 100;
+		pz = Math.random()* 500 - 250;
+		vec = new THREE.Vector3(px, py, pz);
+		particlesGeometry.vertices.push(vec);
+	}
 
+	uniforms = {
+		color: {
+			type: "c", value: new THREE.Color(0x4433CC)
+		},
+	};
 
-	for (var i = 0; i < 5; ++i) {
-		var particleCount = 500000;
-		var particlesGeometry = new THREE.Geometry();
-		for (var p = 0; p < particleCount; p++) {
-			var px, py, pz;
-			var vec;
-			px = Math.random()* 500 - 250;
-			py = Math.random()* 200 - 100;
-			pz = Math.random()* 500 - 250;
-			vec = new THREE.Vector3(px, py, pz);
-			particlesGeometry.vertices.push(vec);
+	attributes = {
+		alpha: {
+			type: "f", value: []
+		},
+		time: {
+			type: "f", value: []
 		}
-		allclouds.push(particlesGeometry);
-	}
+	};
+
+	var shader = new THREE.ShaderMaterial({
+		uniforms: uniforms,
+		attributes: attributes,
+		vertexShader: document.getElementById("vertexShader").textContent,
+		fragmentShader: document.getElementById("fragmentShader").textContent,
+		transparent: true
+	});
+
+	mesh = new THREE.PointCloud(particlesGeometry, shader);
+
+
+	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
 	
+		// set alpha randomly
+		attributes.alpha.value[ i ] = 0.75;
+		attributes.time.value[ i ] = 0;
 
-	// var colors = [0xffa22b, 0xe87727, 0xff6d37, 0xe83f27, 0xff2b3b];
-	var colors = [0x080d7f, 0x2730ff, 0x111aff, 0x3d42ab, 0x0d15cc];
-	for (var i = 0; i < 5; i++) {
-		var particleMaterial = new THREE.PointCloudMaterial({color: colors[(i)%5], size: 0.1});
-		cloud.push(new THREE.PointCloud( allclouds[i], particleMaterial));
-		scene.add(cloud[i]);
-		console.log(cloud[i]);
 	}
-	*/
-	var verticesOfCube = [
-    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
-    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
-	];
 
-	var indicesOfFaces = [
-	    2,1,0,    0,3,2,
-	    0,4,7,    7,3,0,
-	    0,1,5,    5,4,0,
-	    1,2,6,    6,5,1,
-	    2,3,7,    7,6,2,
-	    4,5,6,    6,7,4
-	];
-
-	//var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 1, 5 );
-	var geometry = new THREE.BoxGeometry(1,1,1,100,100,100);
-	var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
-	mesh.material.wireframe = true;
-	mesh.material.color.set(0xffffff);
+	
+	// mesh.material.wireframe = true;
+	// mesh.material.color.set(0xb7ff00);
 	scene.add(mesh);
 	render();
 });
 
 function animation() {
 	time++;
-	var cloudNum = 0;
-	for (var i = 0; i < scene.children.length; i++) {
-		var object = scene.children[i];
-		if (scene.children[i] instanceof THREE.PointCloud) {
-			switch(cloudNum) {
-				case 0:
-					object.position.y = Math.sin(time/10)*5;
-					break;
-				case 1:
-					object.position.y = Math.sin(time/20)*7;
-					break;
-				case 2:
-					object.position.y = Math.sin(time/30)*9;
-					break;
-				case 3:
-					object.position.y = Math.sin(time/20)*7;
-					break;
-				case 4:
-					object.position.y = Math.sin(time/10)*5;
-					break;
-			}
-			cloudNum++;
+	for( var i = 0; i < attributes.time.value.length; i ++ ) {
+	
+		// dynamically change alphas
+		attributes.alpha.value[ i ] *= 0.9;
+		attributes.time.value[i] = time;
+		
+		if ( attributes.alpha.value[ i ] < 0.2 ) { 
+			attributes.alpha.value[ i ] = 1.0;
 		}
+		
 	}
-	// mouseRay();
+
+	// attributes.alpha.needsUpdate = true;
+	attributes.time.needsUpdate = true;
+	// mesh.rotation.x += 0.005;
+	// mesh.rotation.y += 0.005;
 }
 
 function mouseRay() {
@@ -147,7 +141,7 @@ function mouseRay() {
 function render()
 {
 	requestAnimationFrame(render);
-	//animation();
+	animation();
 	renderer.render(scene, camera);
 };
 

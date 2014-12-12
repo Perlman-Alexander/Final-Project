@@ -14,18 +14,21 @@
 		<div id="container"></div>
 	</body>
 	<script id="vertexShader" type="x-shader/x-vertex">
-		varying vec2 vUv;
-		float rand(vec2 n){return 0.5 + 0.5 * fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);}
-		void main(){
-			vUv = uv;
-			vec3 displace = vec3(rand(position.xy), rand(position.yz), rand(position.xz));
-			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0) * vec4(displace, 1.0);
+		attribute float alpha;
+		varying float vAlpha;
+		attribute float time;
+		void main() {
+			vAlpha = alpha;
+			gl_PointSize = 3.0;
+			vec4 mvPosition = modelViewMatrix * vec4( position.x,  position.y + (sin(time/60.0) * sin(mod(position.x, 80.0)) * 10.0), position.z, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 		}
 	</script>
 	<script id="fragmentShader" type="x-shader/x-vertex">
-		varying vec2 vUv;
-		void main(){
-			gl_FragColor = vec4(vec3(vUv, 1), 1);
+		uniform vec3 color;
+		varying float vAlpha;
+		void main() {
+			gl_FragColor = vec4( color, vAlpha );
 		}
 	</script>
 	<script src="js/three.min.js"></script>
