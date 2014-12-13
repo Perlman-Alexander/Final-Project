@@ -82,8 +82,8 @@ window.addEventListener('load', function()
 		transparent: true
 	});
 
-	//mesh = new THREE.PointCloud(particlesGeometry, shader);
-	mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
+	mesh = new THREE.PointCloud(particlesGeometry, shader);
+	// mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
 
 	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
 		attributes.alpha.value[ i ] = 1.0;
@@ -93,10 +93,6 @@ window.addEventListener('load', function()
 	scene.add(mesh);
 	render();
 });
-
-function clamp(x, min, max) {
-	return (x < min) ? min : ((max < x) ? max : x);
-}
 
 function animation() {
 	time++;
@@ -124,6 +120,11 @@ function render()
 	animation();
 	renderer.render(scene, camera);
 };
+
+// https://github.com/Reputeless/PerlinNoise
+function clamp(x, min, max) {
+	return (x < min) ? min : ((max < x) ? max : x);
+}
 
 function octaveNoise(x, y)
 {

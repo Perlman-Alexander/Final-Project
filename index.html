@@ -31,22 +31,22 @@
 			float sineMagnitude = 9.0;
 			float zImpactDivider = 4.0;
 			float sineWave = ratio*(sin((time+position.x+(position.z/zImpactDivider))/waveAmplitude)*sineMagnitude);
-			float noiseScale = 60.0;
+			float noiseScale = 50.0;
 			float sineWaveScale = 10.0;
 			float waveHeightLength = 400.0;
-			if (yval > 170.0) {
-				newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z/zImpactDivider), waveHeightLength))] + sineWaveScale*sineWave;
-			}
-			if (newypos > 100.) 
-			{
+			//if (yval > 1.0) {
+				newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))] + sineWaveScale*sineWave;
+			//}
+			//if (newypos > 100.) 
+			//{
 				vec3 white = vec3(1., 1., 1.);
 				vec3 blue = vec3(0., 0., 1.);
-				color = mix(blue, white, 0.2*((newypos - 100.) / 30.));
-			}
-			else 
-			{
-				color = vec3(0., 0., 1.);
-			}
+				color = mix(blue, white, 0.5*(newypos/300.0));
+			//}
+			// else 
+			// {
+			// 	color = vec3(0., 0., 1.);
+			// }
 			mvPosition = modelViewMatrix * vec4( position.x, newypos, position.z, 1.0 );
 			
 			gl_Position = projectionMatrix * mvPosition;
