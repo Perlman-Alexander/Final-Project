@@ -36,7 +36,7 @@ window.addEventListener('load', function()
 	var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(500, 200, 500), new THREE.MeshNormalMaterial());
 	var boundingBox = new THREE.BoxHelper(mesh2);
 	boundingBox.material.color.setHex(0xFFFFFF);
-	scene.add(boundingBox);
+	// scene.add(boundingBox);
 
 	var particleCount = 500000;
 	var particlesGeometry = new THREE.Geometry();
@@ -73,8 +73,8 @@ window.addEventListener('load', function()
 		transparent: true
 	});
 
-	mesh = new THREE.PointCloud(particlesGeometry, shader);
-
+	//mesh = new THREE.PointCloud(particlesGeometry, shader);
+	mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
 
 	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
 	
