@@ -8,10 +8,11 @@ var uniforms, attributes, material;
 var start;
 var cube;
 var time = 0;
-var mouse2d;
 var intersectingCloud = false;
 var cloud = [];
 var mesh, uniforms, attributes;
+var waveHeights = [];
+var p = [];
 
 window.addEventListener('load', function()
 {
@@ -27,16 +28,8 @@ window.addEventListener('load', function()
 	renderer = new THREE.WebGLRenderer({});
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
-	mouse2d = new THREE.Vector3(0, 0, 1);
-
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
-	container.onmousemove=onDocumentMouseMove;
-
-	var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(500, 200, 500), new THREE.MeshNormalMaterial());
-	var boundingBox = new THREE.BoxHelper(mesh2);
-	boundingBox.material.color.setHex(0xFFFFFF);
-	// scene.add(boundingBox);
 
 	var particleCount = 500000;
 	var particlesGeometry = new THREE.Geometry();
@@ -50,23 +43,39 @@ window.addEventListener('load', function()
 		particlesGeometry.vertices.push(vec);
 	}
 
-	// uniforms = {
-	// 	color: {
-	// 		type: "c", value: new THREE.Color(0x4433CC)
-	// 	},
-	// };
 
-	attributes = {
+	p = [];
+	for (var i = 0; i < 256; i++) {
+		p.push(Math.random()*256);
+	}
+
+	for (var i = 0; i < 20; i++) {
+		for (var j = 0; j < 20; j++) {
+			var n = octaveNoise(i/8, j/8, 8);
+			n = clamp(n*0.5+0.5,0.0,1.0);
+			waveHeights.push(n);
+		}
+	}
+
+ 	attributes = {
 		alpha: {
 			type: "f", value: []
 		},
 		time: {
 			type: "f", value: []
+		},
+	};
+
+	uniforms = {
+		waveHeights: {
+			type: "fv1", value: waveHeights
 		}
 	};
 
+	console.log(waveHeights);
+
 	var shader = new THREE.ShaderMaterial({
-		// uniforms: uniforms,
+		uniforms: uniforms,
 		attributes: attributes,
 		vertexShader: document.getElementById("vertexShader").textContent,
 		fragmentShader: document.getElementById("fragmentShader").textContent,
@@ -77,19 +86,17 @@ window.addEventListener('load', function()
 	mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
 
 	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
-	
-		// set alpha randomly
-		attributes.alpha.value[ i ] = 0.75;
+		attributes.alpha.value[ i ] = 1.0;
 		attributes.time.value[ i ] = 0;
 
 	}
-
-	
-	// mesh.material.wireframe = true;
-	// mesh.material.color.set(0xb7ff00);
 	scene.add(mesh);
 	render();
 });
+
+function clamp(x, min, max) {
+	return (x < min) ? min : ((max < x) ? max : x);
+}
 
 function animation() {
 	time++;
@@ -111,33 +118,6 @@ function animation() {
 	// mesh.rotation.y += 0.005;
 }
 
-function mouseRay() {
-	var r=new THREE.Ray();
-	r.origin=mouse2d.clone();
-	var matrix=camera.matrixWorld.clone();
-	var invert = new THREE.Matrix4().getInverse(camera.projectionMatrix);
-	matrix.multiply(invert);
-	matrix.scale(r.origin);
-	r.direction=r.origin.clone().sub(camera.position);
-	ts=new Date().getTime();
-	var cs= new THREE.Raycaster();
-	cs.ray = r;
-	var intersecting = cs.intersectObject(cloud[0], intersectingCloud);
-	tt=new Date().getTime()-ts;
-	if(intersecting.length>0)
-	{
-		// info.innerHTML=cs.length+" colliders found in "+tt;
-		for(var i=0;i<intersecting.length;i++)
-		{
-			cloud[0] .material.color.set(0x0000FF);
-		}
-	}
-	else
-	{
-		cloud[0] .material.color.set(0x00FF00);
-	}
-}
-
 function render()
 {
 	requestAnimationFrame(render);
@@ -145,11 +125,62 @@ function render()
 	renderer.render(scene, camera);
 };
 
-function onDocumentMouseMove(event)
+function octaveNoise(x, y)
 {
-	event.preventDefault();
-	mouse2d.x=(event.clientX/window.innerWidth)*2-1;
-	mouse2d.y=-(event.clientY/window.innerHeight)*2+1;
-	mouse2d.z=1;
-	// console.log(mouse2d);
+	var result = 0.0;
+	var amp = 1.0;
+	var octaves = 8;
+
+	for(var i = 0; i < octaves; i += 1)
+	{
+		result += noise(x, y) * amp;
+		x *= 2.0;
+		y *= 2.0;
+		amp *= 0.5;
+	}
+	return result;
+}
+function noise(x, y)
+{
+	var z = 0.0;
+	var X = Math.floor(x) & 255;
+	var Y = Math.floor(y) & 255;
+	var Z = Math.floor(z) & 255;
+	x -= Math.floor(x);
+	y -= Math.floor(y);
+	z -= Math.floor(z);
+	var u = fade(x);
+	var v = fade(y);
+	var w = fade(z);
+	var A = p[X] + Y;
+	var AA = p[A] + Z;
+	var AB = p[A+1] + Z;
+	var B = p[X+1] + Y;
+	var BA = p[B] + Z;
+	var BB = p[B+1] + Z;
+	return lerp(w,
+		lerp(v,
+			lerp(u,
+				grad(p[AA], x, y, z),
+				grad(p[BA], x-1.0, y, z)),
+			lerp(u,
+				grad(p[AB], x, y-1.0, z),
+				grad(p[BB], x-1.0, y-1.0, z))),
+		lerp(v,
+			lerp(u,
+				grad(p[AA+1], x, y, z-1.0),
+				grad(p[BA+1], x-1.0, y, z-1.0)),
+		lerp(u,
+			grad(p[AB+1], x, y-1.0, z-1.0),
+			grad(p[BB+1], x-1.0, y-1.0, z-1.0))));
+		
+}
+function fade(t){return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);}
+function lerp(t, a, b){return a + t * (b - a);}
+function grad(hash, x, y, z)
+{
+	var h = hash & 15;
+	var u = h < 8.0 ? x : y;
+	var v = h < 4.0 ? y : h == 12.0 || h == 14.0 ? x : z;
+	return ((h & 1.0) == 0.0 ? u : -u) + ((h & 2.0) == 0.0 ? v : -v);
 }
