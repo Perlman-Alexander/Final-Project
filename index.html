@@ -18,26 +18,28 @@
 	uniform float waveHeights[400];
 	varying float vAlpha;
 	varying vec3 color;
+	varying vec4 mvPosition;
 
 	void main() 
 	{
 		gl_PointSize = 2.0;
-		vec4 mvPosition;
 		float yval = position.y + 90.;
 		float ratio = yval / 180.;
 		float newypos = position.y;
 		float waveAmplitude = 80.0;
 		float sineMagnitude = 9.0;
 		float zImpactDivider = 4.0;
-		float sineWave = ratio*(sin((time+position.x+(position.z/zImpactDivider))/waveAmplitude)*sineMagnitude);
+		float x = ((time+position.x+(position.z/zImpactDivider))/waveAmplitude);
+		float sineWave = ratio*(sin(x)*sineMagnitude);
 		float noiseScale = 50.0;
 		float sineWaveScale = 10.0;
 		float waveHeightLength = 400.0;
 		newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))] + sineWaveScale*sineWave;
 		vec3 white = vec3(1., 1., 1.);
-		vec3 blue = vec3(0., 0., 1.);
+		vec3 blue = vec3(0.8, 0.4, 0.);
 		color = mix(blue, white, 0.5*(newypos/300.0));
-		mvPosition = modelViewMatrix * vec4( position.x, newypos, position.z, 1.0 );
+		vec3 newposition = vec3(position.x, newypos, position.z);
+		mvPosition = modelViewMatrix * vec4( newposition, 1.0 );
 		gl_Position = projectionMatrix * mvPosition;
 	}
 </script>

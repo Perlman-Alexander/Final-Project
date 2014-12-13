@@ -9,6 +9,7 @@ var time = 0;
 var mesh, uniforms, attributes;
 var waveHeights = [];
 var p = [];
+var mouse2d;
 
 window.addEventListener('load', function()
 {
@@ -21,24 +22,29 @@ window.addEventListener('load', function()
 	camera.lookAt(scene.position);
 	scene.add(camera);
 
+	mouse2d = new THREE.Vector3(0, 0, 1);
+
 	renderer = new THREE.WebGLRenderer({});
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
+	container.onmousemove=onDocumentMouseMove;
 
 	var particleCount = 500000;
 	var particlesGeometry = new THREE.Geometry();
 	for (var p = 0; p < particleCount; p++) {
 		var px, py, pz;
 		var vec;
-		px = Math.random()* 500 - 250;
-		py = Math.random()* 200 - 100;
-		pz = Math.random()* 500 - 250;
+		do {
+			px = Math.random()* 3000 - 1500;
+			py = Math.random()* 200 - 100;
+			pz = Math.random()* 3000 - 1500;
+		} while(Math.sqrt(px*px+pz*pz) > 1000);
+		
 		vec = new THREE.Vector3(px, py, pz);
 		particlesGeometry.vertices.push(vec);
 	}
-
 
 	p = [];
 	for (var i = 0; i < 256; i++) {
@@ -56,7 +62,7 @@ window.addEventListener('load', function()
  	attributes = {
 		time: {
 			type: "f", value: []
-		},
+		}
 	};
 
 	uniforms = {
@@ -75,10 +81,10 @@ window.addEventListener('load', function()
 
 	mesh = new THREE.PointCloud(particlesGeometry, shader);
 	// mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
+	// mesh = new THREE.Mesh(new THREE.SphereGeometry(250,50,50), shader);
 
 	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
 		attributes.time.value[ i ] = 0;
-
 	}
 	scene.add(mesh);
 	render();
@@ -86,6 +92,7 @@ window.addEventListener('load', function()
 
 function animation() {
 	time++;
+
 	for( var i = 0; i < attributes.time.value.length; i ++ ) {
 		attributes.time.value[i] = time;
 	}
@@ -162,4 +169,11 @@ function grad(hash, x, y, z)
 	var u = h < 8.0 ? x : y;
 	var v = h < 4.0 ? y : h == 12.0 || h == 14.0 ? x : z;
 	return ((h & 1.0) == 0.0 ? u : -u) + ((h & 2.0) == 0.0 ? v : -v);
+}
+function onDocumentMouseMove(event)
+{
+	event.preventDefault();
+	mouse2d.x=(event.clientX/window.innerWidth)*2-1;
+	mouse2d.y=-(event.clientY/window.innerHeight)*2+1;
+	mouse2d.z=1;
 }
