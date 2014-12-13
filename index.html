@@ -25,9 +25,11 @@
 			float yval = position.y + 90.;
 			float ratio = yval / 180.;
 			float newypos = position.y+(ratio*(sin((time+position.x+(position.z/4.))/20.0)*9.));
-			if (newypos > 92.) 
+			if (newypos > 85.) 
 			{
-				color = vec3(1., 1., 1.);
+				vec3 white = vec3(1., 1., 1.);
+				vec3 blue = vec3(0., 0., 1.);
+				color = mix(blue, white, 0.2*((newypos - 85.) / 10.));
 			}
 			else 
 			{
