@@ -50,11 +50,11 @@ window.addEventListener('load', function()
 		particlesGeometry.vertices.push(vec);
 	}
 
-	uniforms = {
-		color: {
-			type: "c", value: new THREE.Color(0x4433CC)
-		},
-	};
+	// uniforms = {
+	// 	color: {
+	// 		type: "c", value: new THREE.Color(0x4433CC)
+	// 	},
+	// };
 
 	attributes = {
 		alpha: {
@@ -66,7 +66,7 @@ window.addEventListener('load', function()
 	};
 
 	var shader = new THREE.ShaderMaterial({
-		uniforms: uniforms,
+		// uniforms: uniforms,
 		attributes: attributes,
 		vertexShader: document.getElementById("vertexShader").textContent,
 		fragmentShader: document.getElementById("fragmentShader").textContent,

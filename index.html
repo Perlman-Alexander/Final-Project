@@ -17,16 +17,31 @@
 		attribute float alpha;
 		varying float vAlpha;
 		attribute float time;
+		varying vec3 color;
 		void main() {
 			vAlpha = alpha;
-			gl_PointSize = 3.0;
-			vec4 mvPosition = modelViewMatrix * vec4( position.x,  position.y + (sin(time/60.0) * sin(mod(position.x, 80.0)) * 10.0), position.z, 1.0 );
+			gl_PointSize = 2.0;
+			vec4 mvPosition;
+			float yval = position.y + 90.;
+			float ratio = yval / 180.;
+			float newypos = position.y+(ratio*(sin((time+position.x+(position.z/4.))/20.0)*9.));
+			if (newypos > 92.) 
+			{
+				color = vec3(1., 1., 1.);
+			}
+			else 
+			{
+				color = vec3(0., 0., 1.);
+			}
+			mvPosition = modelViewMatrix * vec4( position.x, newypos, position.z, 1.0 );
+			
 			gl_Position = projectionMatrix * mvPosition;
 		}
 	</script>
 	<script id="fragmentShader" type="x-shader/x-vertex">
-		uniform vec3 color;
+		// uniform vec3 color;
 		varying float vAlpha;
+		varying vec3 color;
 		void main() {
 			gl_FragColor = vec4( color, vAlpha );
 		}
