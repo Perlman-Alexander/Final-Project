@@ -5,11 +5,7 @@
 var container;
 var scene, camera, controls, renderer;
 var uniforms, attributes, material;
-var start;
-var cube;
 var time = 0;
-var intersectingCloud = false;
-var cloud = [];
 var mesh, uniforms, attributes;
 var waveHeights = [];
 var p = [];
@@ -58,9 +54,6 @@ window.addEventListener('load', function()
 	}
 
  	attributes = {
-		alpha: {
-			type: "f", value: []
-		},
 		time: {
 			type: "f", value: []
 		},
@@ -71,8 +64,6 @@ window.addEventListener('load', function()
 			type: "fv1", value: waveHeights
 		}
 	};
-
-	console.log(waveHeights);
 
 	var shader = new THREE.ShaderMaterial({
 		uniforms: uniforms,
@@ -86,7 +77,6 @@ window.addEventListener('load', function()
 	// mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
 
 	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
-		attributes.alpha.value[ i ] = 1.0;
 		attributes.time.value[ i ] = 0;
 
 	}
@@ -97,21 +87,9 @@ window.addEventListener('load', function()
 function animation() {
 	time++;
 	for( var i = 0; i < attributes.time.value.length; i ++ ) {
-	
-		// dynamically change alphas
-		attributes.alpha.value[ i ] *= 0.9;
 		attributes.time.value[i] = time;
-		
-		if ( attributes.alpha.value[ i ] < 0.2 ) { 
-			attributes.alpha.value[ i ] = 1.0;
-		}
-		
 	}
-
-	// attributes.alpha.needsUpdate = true;
 	attributes.time.needsUpdate = true;
-	// mesh.rotation.x += 0.005;
-	// mesh.rotation.y += 0.005;
 }
 
 function render()

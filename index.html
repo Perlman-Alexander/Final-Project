@@ -1,66 +1,54 @@
 <!doctype html>
 <html>
-	<head>
-		<title>Perlman-Alexander</title>
-		<style>
-		body, html
-		{
-			overflow-x: hidden;
-			overflow-y: hidden;
-		}
-		</style>
-	</head>
-	<body>
-		<div id="container"></div>
-	</body>
-	<script id="vertexShader" type="x-shader/x-vertex">
-		attribute float alpha;
-		attribute float time;
-		uniform float waveHeights[400];
-		varying float vAlpha;
-		varying vec3 color;
+<head>
+	<title>Perlman-Alexander</title>
+	<style>
+	body, html
+	{
+		overflow-x: hidden;
+		overflow-y: hidden;
+	}
+	</style>
+</head>
+<body>
+	<div id="container"></div>
+</body>
+<script id="vertexShader" type="x-shader/x-vertex">
+	attribute float time;
+	uniform float waveHeights[400];
+	varying float vAlpha;
+	varying vec3 color;
 
-		void main() {
-			vAlpha = alpha;
-			gl_PointSize = 2.0;
-			vec4 mvPosition;
-			float yval = position.y + 90.;
-			float ratio = yval / 180.;
-			float newypos = position.y;
-			float waveAmplitude = 80.0;
-			float sineMagnitude = 9.0;
-			float zImpactDivider = 4.0;
-			float sineWave = ratio*(sin((time+position.x+(position.z/zImpactDivider))/waveAmplitude)*sineMagnitude);
-			float noiseScale = 50.0;
-			float sineWaveScale = 10.0;
-			float waveHeightLength = 400.0;
-			//if (yval > 1.0) {
-				newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))] + sineWaveScale*sineWave;
-			//}
-			//if (newypos > 100.) 
-			//{
-				vec3 white = vec3(1., 1., 1.);
-				vec3 blue = vec3(0., 0., 1.);
-				color = mix(blue, white, 0.5*(newypos/300.0));
-			//}
-			// else 
-			// {
-			// 	color = vec3(0., 0., 1.);
-			// }
-			mvPosition = modelViewMatrix * vec4( position.x, newypos, position.z, 1.0 );
-			
-			gl_Position = projectionMatrix * mvPosition;
-		}
-	</script>
-	<script id="fragmentShader" type="x-shader/x-vertex">
-		// uniform vec3 color;
-		varying float vAlpha;
-		varying vec3 color;
-		void main() {
-			gl_FragColor = vec4( color, vAlpha );
-		}
-	</script>
-	<script src="js/three.min.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/main.js"></script>
+	void main() 
+	{
+		gl_PointSize = 2.0;
+		vec4 mvPosition;
+		float yval = position.y + 90.;
+		float ratio = yval / 180.;
+		float newypos = position.y;
+		float waveAmplitude = 80.0;
+		float sineMagnitude = 9.0;
+		float zImpactDivider = 4.0;
+		float sineWave = ratio*(sin((time+position.x+(position.z/zImpactDivider))/waveAmplitude)*sineMagnitude);
+		float noiseScale = 50.0;
+		float sineWaveScale = 10.0;
+		float waveHeightLength = 400.0;
+		newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))] + sineWaveScale*sineWave;
+		vec3 white = vec3(1., 1., 1.);
+		vec3 blue = vec3(0., 0., 1.);
+		color = mix(blue, white, 0.5*(newypos/300.0));
+		mvPosition = modelViewMatrix * vec4( position.x, newypos, position.z, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+	}
+</script>
+<script id="fragmentShader" type="x-shader/x-vertex">
+	varying vec3 color;
+	void main()
+	{
+		gl_FragColor = vec4( color, 1.0 );
+	}
+</script>
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/main.js"></script>
 </html>
