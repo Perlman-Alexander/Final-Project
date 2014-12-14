@@ -13,7 +13,7 @@
 </head>
 <body>
 	<div style="position: absolute; color: white; bottom: 50px; left: 50px; font-size: 50px;">Maxwell Perlman and Stefan Alexander - Wave Simulator</div>
-	<div style="left: 50px; top: 50px; position: absolute; background-color: white;">
+	<div style="left: 50px; top: 50px; position: absolute; background-color: white; padding: 10px 30px 30px 30px; border-radius: 10px;">
 		<h2>Wavelength</h2>
 		<input id="wavelength" type="range" min="30" max="700" step="10" value="80">
 		<h2>Wave Amplitude</h2>
@@ -23,7 +23,7 @@
 		<h2>Wave Speed</h2>
 		<input id="wavespeed" type="range" min="1" max="100" step="5" value="21">
 	</div>
-	<div style="right: 50px; top: 50px; position: absolute; background-color: white;">
+	<div style="right: 50px; top: 50px; position: absolute; background-color: white; padding: 10px 30px 30px 30px;  border-radius: 10px">
 		<h2>Color 1 - R</h2>
 		<input id="c1r" type="range" min="0" max="255" step="1" value="0">
 		<h2>Color 1 - G</h2>
@@ -79,7 +79,9 @@
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/rangeslider.min.js"></script>
 <script>
-	$('input[type="range"]').rangeslider();
+	$('input[type="range"]').rangeslider({
+		polyfill: false
+	});
 </script>
 <script src="js/three.min.js"></script>
 <script src="js/OrbitControls.js"></script>
