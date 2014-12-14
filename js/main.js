@@ -1,6 +1,6 @@
 // References
 // http://threejs.org/examples/webgl_particles_random.html
-// http://www.ro.me/tech/mouse-in-3d-space
+// https://github.com/Reputeless/PerlinNoise
 
 var container;
 var scene, camera, controls, renderer;
@@ -8,7 +8,6 @@ var uniforms, attributes, material;
 var time = 0;
 var mesh, uniforms, attributes;
 var p = [];
-var mouse2d;
 var particleCount = 500000;
 var particlesGeometry = new THREE.Geometry();
 
@@ -16,7 +15,6 @@ var particlesGeometry = new THREE.Geometry();
 var waveHeights = []; // not this one
 var waveLength = 80.0;
 var waveAmplitude = 90.0;
-var zRotation = 4.0;
 var noiseScale = 50.0;
 var maincolor = new THREE.Color(0x0000FF);
 var subcolor = new THREE.Color(0xFFFFFF);
@@ -29,11 +27,9 @@ $( window ).load(function()
 
 	camera = new THREE.PerspectiveCamera(45 , window.innerWidth / window.innerHeight, 0.01, 100000);
 	camera.position.set(0, 4000, -4000);
-	camera.aspect = 2;
+	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.lookAt(scene.position);
 	scene.add(camera);
-
-	mouse2d = new THREE.Vector3(0, 0, 1);
 
 	renderer = new THREE.WebGLRenderer({});
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -87,7 +83,6 @@ function generateCloud(pnum) {
 		waveHeightLength: 	{ type: "f", 	value: waveHeights.length },
 		waveLength: 		{ type: "f", 	value: waveLength },
 		waveAmplitude: 		{ type: "f", 	value: waveAmplitude },
-		zRotation: 			{ type: "f", 	value: zRotation },
 		noiseScale: 		{ type: "f", 	value: noiseScale },
 		maincolor: 			{ type: "c", 	value: maincolor },
 		subcolor: 			{ type: "c", 	value: subcolor },
@@ -106,11 +101,9 @@ function generateCloud(pnum) {
 
 function animation() {
 	time++;
-
 	uniforms.time.value = time;
 	uniforms.waveLength.value = $('#wavelength').val();
 	uniforms.waveAmplitude.value = $('#waveamplitude').val();
-	uniforms.zRotation.value = zRotation;
 	uniforms.noiseScale.value = $('#noisescale').val();
 	uniforms.maincolor.value.setRGB($('#c1r').val()/255, $('#c1g').val()/255, $('#c1b').val()/255);
 	uniforms.subcolor.value.setRGB($('#c2r').val()/255, $('#c2g').val()/255, $('#c2b').val()/255);
@@ -124,7 +117,6 @@ function render()
 	renderer.render(scene, camera);
 };
 
-// https://github.com/Reputeless/PerlinNoise
 function clamp(x, min, max) {
 	return (x < min) ? min : ((max < x) ? max : x);
 }
