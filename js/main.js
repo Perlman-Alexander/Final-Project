@@ -9,6 +9,9 @@ var time = 0;
 var mesh, uniforms, attributes;
 var p = [];
 var mouse2d;
+var particleCount = 500000;
+var particlesGeometry = new THREE.Geometry();
+
 
 // Uniforms
 var waveHeights = []; // not this one
@@ -40,20 +43,7 @@ window.addEventListener('load', function()
 	controls = new THREE.OrbitControls(camera);
 	container.onmousemove=onDocumentMouseMove;
 
-	var particleCount = 500000;
-	var particlesGeometry = new THREE.Geometry();
-	for (var p = 0; p < particleCount; p++) {
-		var px, py, pz;
-		var vec;
-		do {
-			px = Math.random()* 3000 - 1500;
-			py = Math.random()* 200 - 100;
-			pz = Math.random()* 3000 - 1500;
-		} while(Math.sqrt(px*px+pz*pz) > 1500);
-		
-		vec = new THREE.Vector3(px, py, pz);
-		particlesGeometry.vertices.push(vec);
-	}
+	generateCloud(particleCount);
 
 	p = [];
 	for (var i = 0; i < 256; i++) {
@@ -66,6 +56,27 @@ window.addEventListener('load', function()
 			n = clamp(n*0.5+0.5,0.0,1.0);
 			waveHeights.push(n);
 		}
+	}
+
+	render();
+});
+
+function generateCloud(pnum) {
+	if (scene.children.length == 2) {
+		scene.children.pop();
+		particlesGeometry = new THREE.Geometry();
+	}
+	for (var p = 0; p < pnum; p++) {
+		var px, py, pz;
+		var vec;
+		do {
+			px = Math.random()* 3000 - 1500;
+			py = Math.random()* 200 - 100;
+			pz = Math.random()* 3000 - 1500;
+		} while(Math.sqrt(px*px+pz*pz) > 1500);
+		
+		vec = new THREE.Vector3(px, py, pz);
+		particlesGeometry.vertices.push(vec);
 	}
 
 	uniforms = {
@@ -87,14 +98,9 @@ window.addEventListener('load', function()
 		fragmentShader: document.getElementById("fragmentShader").textContent,
 		transparent: true
 	});
-
 	mesh = new THREE.PointCloud(particlesGeometry, shader);
-	// mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
-	// mesh = new THREE.Mesh(new THREE.SphereGeometry(250,50,50), shader);
-
 	scene.add(mesh);
-	render();
-});
+}
 
 function animation() {
 	time++;
@@ -107,6 +113,7 @@ function animation() {
 	uniforms.maincolor.value.setRGB($('#c1r').val()/255, $('#c1g').val()/255, $('#c1b').val()/255);
 	uniforms.subcolor.value.setRGB($('#c2r').val()/255, $('#c2g').val()/255, $('#c2b').val()/255);
 	uniforms.wavespeed.value = $('#wavespeed').val();
+	mesh.geometry.verticesNeedUpdate = true;
 }
 
 function render()
