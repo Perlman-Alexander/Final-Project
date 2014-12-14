@@ -41,7 +41,6 @@ window.addEventListener('load', function()
 
 	container.appendChild(renderer.domElement);
 	controls = new THREE.OrbitControls(camera);
-	container.onmousemove=onDocumentMouseMove;
 
 	generateCloud(particleCount);
 
@@ -113,7 +112,6 @@ function animation() {
 	uniforms.maincolor.value.setRGB($('#c1r').val()/255, $('#c1g').val()/255, $('#c1b').val()/255);
 	uniforms.subcolor.value.setRGB($('#c2r').val()/255, $('#c2g').val()/255, $('#c2b').val()/255);
 	uniforms.wavespeed.value = $('#wavespeed').val();
-	mesh.geometry.verticesNeedUpdate = true;
 }
 
 function render()
@@ -186,11 +184,4 @@ function grad(hash, x, y, z)
 	var u = h < 8.0 ? x : y;
 	var v = h < 4.0 ? y : h == 12.0 || h == 14.0 ? x : z;
 	return ((h & 1.0) == 0.0 ? u : -u) + ((h & 2.0) == 0.0 ? v : -v);
-}
-function onDocumentMouseMove(event)
-{
-	event.preventDefault();
-	mouse2d.x=(event.clientX/window.innerWidth)*2-1;
-	mouse2d.y=-(event.clientY/window.innerHeight)*2+1;
-	mouse2d.z=1;
 }
