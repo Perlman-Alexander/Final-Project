@@ -48,8 +48,8 @@ $( window ).load(function()
 		p.push(Math.random()*256);
 	}
 
-	for (var i = 0; i < 20; i++) {
-		for (var j = 0; j < 20; j++) {
+	for (var i = 0; i < 10; i++) {
+		for (var j = 0; j < 10; j++) {
 			var n = octaveNoise(i/8, j/8, 8);
 			n = clamp(n*0.5+0.5,0.0,1.0);
 			waveHeights.push(n);
