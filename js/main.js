@@ -8,7 +8,7 @@ var uniforms, attributes, material;
 var time = 0;
 var mesh, uniforms, attributes;
 var p = [];
-var particleCount = 500000;
+var particleCount = 10000;
 var particlesGeometry = new THREE.Geometry();
 
 // Uniforms
