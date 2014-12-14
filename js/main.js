@@ -12,7 +12,6 @@ var mouse2d;
 var particleCount = 500000;
 var particlesGeometry = new THREE.Geometry();
 
-
 // Uniforms
 var waveHeights = []; // not this one
 var waveLength = 80.0;
@@ -23,7 +22,7 @@ var maincolor = new THREE.Color(0x0000FF);
 var subcolor = new THREE.Color(0xFFFFFF);
 var wavespeed = 1.0;
 
-window.addEventListener('load', function()
+$( window ).load(function()
 {
 	container = document.getElementById("container");
 	scene = new THREE.Scene();
@@ -58,6 +57,10 @@ window.addEventListener('load', function()
 	}
 
 	render();
+});
+
+$("#particles").change(function() {
+	generateCloud($("#particles").val());
 });
 
 function generateCloud(pnum) {
