@@ -11,13 +11,14 @@ var p = [];
 var mouse2d;
 
 // Uniforms
-var waveHeights = [];
+var waveHeights = []; // not this one
 var waveLength = 80.0;
 var waveAmplitude = 90.0;
 var zRotation = 4.0;
 var noiseScale = 50.0;
 var maincolor = new THREE.Color(0x0000FF);
 var subcolor = new THREE.Color(0xFFFFFF);
+var wavespeed = 1.0;
 
 window.addEventListener('load', function()
 {
@@ -36,8 +37,8 @@ window.addEventListener('load', function()
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	container.appendChild(renderer.domElement);
-	controls = new THREE.OrbitControls(camera);
-	container.onmousemove=onDocumentMouseMove;
+	//controls = new THREE.OrbitControls(camera);
+	//container.onmousemove=onDocumentMouseMove;
 
 	var particleCount = 500000;
 	var particlesGeometry = new THREE.Geometry();
@@ -76,7 +77,8 @@ window.addEventListener('load', function()
 		zRotation: 			{ type: "f", 	value: zRotation },
 		noiseScale: 		{ type: "f", 	value: noiseScale },
 		maincolor: 			{ type: "c", 	value: maincolor },
-		subcolor: 			{ type: "c", 	value: subcolor }
+		subcolor: 			{ type: "c", 	value: subcolor },
+		wavespeed: 			{ type: "f", 	value: wavespeed}
 	};
 
 	var shader = new THREE.ShaderMaterial({
@@ -98,12 +100,13 @@ function animation() {
 	time++;
 
 	uniforms.time.value = time;
-	uniforms.waveLength.value = waveLength;
-	uniforms.waveAmplitude.value = waveAmplitude;
+	uniforms.waveLength.value = $('#wavelength').val();
+	uniforms.waveAmplitude.value = $('#waveamplitude').val();
 	uniforms.zRotation.value = zRotation;
-	uniforms.noiseScale.value = noiseScale;
-	uniforms.maincolor.value = maincolor;
-	uniforms.subcolor.value = subcolor;
+	uniforms.noiseScale.value = $('#noisescale').val();
+	uniforms.maincolor.value.setRGB($('#c1r').val()/255, $('#c1g').val()/255, $('#c1b').val()/255);
+	uniforms.subcolor.value.setRGB($('#c2r').val()/255, $('#c2g').val()/255, $('#c2b').val()/255);
+	uniforms.wavespeed.value = $('#wavespeed').val();
 }
 
 function render()
