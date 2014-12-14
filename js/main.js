@@ -13,7 +13,11 @@ var mouse2d;
 // Uniforms
 var waveHeights = [];
 var waveLength = 80.0;
-var waveAmplitude = 9.0;
+var waveAmplitude = 90.0;
+var zRotation = 4.0;
+var noiseScale = 50.0;
+var maincolor = new THREE.Color(0x0000FF);
+var subcolor = new THREE.Color(0xFFFFFF);
 
 window.addEventListener('load', function()
 {
@@ -64,18 +68,15 @@ window.addEventListener('load', function()
 	}
 
 	uniforms = {
-		time: {
-			type: "f", value: time
-		},
-		waveHeights: {
-			type: "fv1", value: waveHeights
-		},
-		waveLength: {
-			type: "f", value: waveLength
-		},
-		waveAmplitude: {
-			type: "f", value: waveAmplitude
-		}
+		time: 				{ type: "f", 	value: time },
+		waveHeights: 		{ type: "fv1", 	value: waveHeights },
+		waveHeightLength: 	{ type: "f", 	value: waveHeights.length },
+		waveLength: 		{ type: "f", 	value: waveLength },
+		waveAmplitude: 		{ type: "f", 	value: waveAmplitude },
+		zRotation: 			{ type: "f", 	value: zRotation },
+		noiseScale: 		{ type: "f", 	value: noiseScale },
+		maincolor: 			{ type: "c", 	value: maincolor },
+		subcolor: 			{ type: "c", 	value: subcolor }
 	};
 
 	var shader = new THREE.ShaderMaterial({
@@ -99,10 +100,10 @@ function animation() {
 	uniforms.time.value = time;
 	uniforms.waveLength.value = waveLength;
 	uniforms.waveAmplitude.value = waveAmplitude;
-
-	uniforms.time.needsUpdate = true;
-	uniforms.waveLength.needsUpdate = true;
-	uniforms.waveAmplitude.needsUpdate = true;
+	uniforms.zRotation.value = zRotation;
+	uniforms.noiseScale.value = noiseScale;
+	uniforms.maincolor.value = maincolor;
+	uniforms.subcolor.value = subcolor;
 }
 
 function render()
