@@ -17,6 +17,7 @@
 	uniform float time;
 	uniform float waveHeights[400];
 	uniform float waveLength;
+	uniform float waveAmplitude;
 	varying float vAlpha;
 	varying vec3 color;
 	varying vec4 mvPosition;
@@ -24,13 +25,12 @@
 	void main() 
 	{
 		gl_PointSize = 2.0;
-		float yval = position.y + 90.;
-		float ratio = yval / 180.;
+		float yval = position.y + 100.;
+		float ratio = yval / 200.;
 		float newypos = position.y;
-		float sineMagnitude = 9.0;
 		float zImpactDivider = 4.0;
 		float x = ((time+position.x+(position.z/zImpactDivider))/waveLength);
-		float sineWave = ratio*(sin(x)*sineMagnitude);
+		float sineWave = ratio*(sin(x)*waveAmplitude);
 		float noiseScale = 50.0;
 		float sineWaveScale = 10.0;
 		float waveHeightLength = 400.0;

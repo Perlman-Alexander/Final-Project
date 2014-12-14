@@ -13,6 +13,7 @@ var mouse2d;
 // Uniforms
 var waveHeights = [];
 var waveLength = 80.0;
+var waveAmplitude = 9.0;
 
 window.addEventListener('load', function()
 {
@@ -71,6 +72,9 @@ window.addEventListener('load', function()
 		},
 		waveLength: {
 			type: "f", value: waveLength
+		},
+		waveAmplitude: {
+			type: "f", value: waveAmplitude
 		}
 	};
 
@@ -94,9 +98,11 @@ function animation() {
 
 	uniforms.time.value = time;
 	uniforms.waveLength.value = waveLength;
+	uniforms.waveAmplitude.value = waveAmplitude;
 
 	uniforms.time.needsUpdate = true;
 	uniforms.waveLength.needsUpdate = true;
+	uniforms.waveAmplitude.needsUpdate = true;
 }
 
 function render()
