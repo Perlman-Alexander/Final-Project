@@ -14,8 +14,9 @@
 	<div id="container"></div>
 </body>
 <script id="vertexShader" type="x-shader/x-vertex">
-	attribute float time;
+	uniform float time;
 	uniform float waveHeights[400];
+	uniform float waveLength;
 	varying float vAlpha;
 	varying vec3 color;
 	varying vec4 mvPosition;
@@ -26,10 +27,9 @@
 		float yval = position.y + 90.;
 		float ratio = yval / 180.;
 		float newypos = position.y;
-		float waveAmplitude = 80.0;
 		float sineMagnitude = 9.0;
 		float zImpactDivider = 4.0;
-		float x = ((time+position.x+(position.z/zImpactDivider))/waveAmplitude);
+		float x = ((time+position.x+(position.z/zImpactDivider))/waveLength);
 		float sineWave = ratio*(sin(x)*sineMagnitude);
 		float noiseScale = 50.0;
 		float sineWaveScale = 10.0;

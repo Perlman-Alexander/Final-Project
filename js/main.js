@@ -7,9 +7,12 @@ var scene, camera, controls, renderer;
 var uniforms, attributes, material;
 var time = 0;
 var mesh, uniforms, attributes;
-var waveHeights = [];
 var p = [];
 var mouse2d;
+
+// Uniforms
+var waveHeights = [];
+var waveLength = 80.0;
 
 window.addEventListener('load', function()
 {
@@ -17,7 +20,7 @@ window.addEventListener('load', function()
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera(45 , window.innerWidth / window.innerHeight, 0.01, 100000);
-	camera.position.set(0, 0, -1400);
+	camera.position.set(0, 4000, -4000);
 	camera.aspect = 2;
 	camera.lookAt(scene.position);
 	scene.add(camera);
@@ -40,7 +43,7 @@ window.addEventListener('load', function()
 			px = Math.random()* 3000 - 1500;
 			py = Math.random()* 200 - 100;
 			pz = Math.random()* 3000 - 1500;
-		} while(Math.sqrt(px*px+pz*pz) > 1000);
+		} while(Math.sqrt(px*px+pz*pz) > 1500);
 		
 		vec = new THREE.Vector3(px, py, pz);
 		particlesGeometry.vertices.push(vec);
@@ -59,21 +62,20 @@ window.addEventListener('load', function()
 		}
 	}
 
- 	attributes = {
-		time: {
-			type: "f", value: []
-		}
-	};
-
 	uniforms = {
+		time: {
+			type: "f", value: time
+		},
 		waveHeights: {
 			type: "fv1", value: waveHeights
+		},
+		waveLength: {
+			type: "f", value: waveLength
 		}
 	};
 
 	var shader = new THREE.ShaderMaterial({
 		uniforms: uniforms,
-		attributes: attributes,
 		vertexShader: document.getElementById("vertexShader").textContent,
 		fragmentShader: document.getElementById("fragmentShader").textContent,
 		transparent: true
@@ -83,9 +85,6 @@ window.addEventListener('load', function()
 	// mesh = new THREE.Mesh(new THREE.BoxGeometry(500,200,500,50,50,50), shader);
 	// mesh = new THREE.Mesh(new THREE.SphereGeometry(250,50,50), shader);
 
-	for( var i = 0; i < mesh.geometry.vertices.length; i ++ ) {
-		attributes.time.value[ i ] = 0;
-	}
 	scene.add(mesh);
 	render();
 });
@@ -93,10 +92,11 @@ window.addEventListener('load', function()
 function animation() {
 	time++;
 
-	for( var i = 0; i < attributes.time.value.length; i ++ ) {
-		attributes.time.value[i] = time;
-	}
-	attributes.time.needsUpdate = true;
+	uniforms.time.value = time;
+	uniforms.waveLength.value = waveLength;
+
+	uniforms.time.needsUpdate = true;
+	uniforms.waveLength.needsUpdate = true;
 }
 
 function render()
