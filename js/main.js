@@ -37,8 +37,8 @@ window.addEventListener('load', function()
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	container.appendChild(renderer.domElement);
-	//controls = new THREE.OrbitControls(camera);
-	//container.onmousemove=onDocumentMouseMove;
+	controls = new THREE.OrbitControls(camera);
+	container.onmousemove=onDocumentMouseMove;
 
 	var particleCount = 500000;
 	var particlesGeometry = new THREE.Geometry();
