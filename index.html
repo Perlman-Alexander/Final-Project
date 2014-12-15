@@ -12,7 +12,10 @@
 	</style>
 </head>
 <body>
+	<!-- Title / Name labels. -->
 	<div style="position: absolute; color: white; bottom: 50px; left: 50px; font-size: 30px;"><span style="font-size: 90px; margin-right: 30px;">Wave Simulator</span> by Maxwell Perlman and Stefan Alexander</div>
+	
+	<!-- Left side UI elements. -->
 	<div style="left: 50px; top: 50px; position: absolute; background-color: rgba(255, 255, 255, 0.9); padding: 10px 30px 30px 30px; border-radius: 10px; min-width: 200px;">
 		<h2>Quality</h2>
 		<input id="particles" type="range" min="10000" max="500000" step="1000" value="10000">
@@ -25,6 +28,8 @@
 		<h2>Wave Speed</h2>
 		<input id="wavespeed" type="range" min="1" max="100" step="5" value="21">
 	</div>
+
+	<!-- Right side UI elements. -->
 	<div style="right: 50px; top: 50px; position: absolute; background-color:  rgba(255, 255, 255, 0.9); padding: 10px 30px 30px 30px;  border-radius: 10px; min-width: 200px;">
 		<h2>Color 1 - R</h2>
 		<input id="c1r" type="range" min="0" max="255" step="1" value="0">
@@ -39,43 +44,81 @@
 		<h2>Color 2 - B</h2>
 		<input id="c2b" type="range" min="0" max="255" step="5" value="255">
 	</div>
+
+	<!-- Container will have the contented added via main.js once the page loads. -->
 	<div id="container"></div>
 </body>
+
+<!-- Vertex Shader. -->
 <script id="vertexShader" type="x-shader/x-vertex">
-	uniform float time;
-	uniform float waveHeights[100];
-	uniform float waveHeightLength;
-	uniform float waveLength;
-	uniform float waveAmplitude;
-	uniform float noiseScale;
-	uniform float wavespeed;
-	uniform vec3 maincolor;
-	uniform vec3 subcolor;
-	varying vec3 color;
+	// Uniform variables are those that get sent from our main.js file.
+	uniform float time;					// The number of ticks passed since the page is loaded.
+	uniform float waveHeights[100];		// The array that contains Perlin noise values computed in the main.js.
+	uniform float waveHeightLength;		// The number of elements in the waveHeights array.
+	uniform float waveLength;			// The wave length specified by the user.
+	uniform float waveAmplitude;		// The wave amplitude specified by the user.
+	uniform float noiseScale;			// The noise scale specified by the user.
+	uniform float wavespeed;			// The wave speed specified by the user.
+	uniform vec3 maincolor;				// The main color specified by the user (as rgb).
+	uniform vec3 subcolor;				// The sub color (the color for the top of the waves) specified by the user (as rgb).
+	
+	// Variable to be sent to the fragment shader.
+	varying vec3 color;					// The final computed color.
 
 	void main() 
 	{
+		// Set the size of the vertex point.
 		gl_PointSize = 2.0;
-		float ratio = (position.y + 100.) / 200.;
+
+		// This is the temporary value computed to be used to get the sine value of for generating sine waves. The y-position of each particle depends on the wave speed, the time, the position in x and z dimensions, and the wave length.
 		float x = ((wavespeed*time+position.x+(position.z/4.0))/waveLength);
+
+		// In our program the y-value ranges from -100 to +100 so first add 100 to shift it to 0 and 200. Then we get the ratio of that with 200 to get the relation of this current vertex position to the whole cloud.
+		float ratio = (position.y + 100.) / 200.;
+
+		// Once we have the value to use to make the sine waves and the ratio, we multiply those to the given wave amplitude as well to have the final sine wave. The ratio makes sure the vertices at the top are more affected by the wave than the vertices at the bottom for the y-positions.
 		float sineWave = ratio*(sin(x)*waveAmplitude);
-		float newypos = position.y + noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))] + sineWave;
+
+		// In order to get the noise value we take the corresponding value in the wave heights array relative to the time and positions in the x and z dimensions of the current vertex and then multiply that by the noise scale.
+		float noiseValue = noiseScale*waveHeights[int(mod((time+position.x+position.z), waveHeightLength))];
+
+		// The final y position is the sum of the original y position, the noise value, and the sine wave.
+		float newypos = position.y + noiseValue + sineWave;
+
+		// The color will be a mix between the main color and sub color relative to where the new y position is relative to the cloud.
 		color = mix(maincolor, subcolor, 0.5*(newypos/300.0));
+
+		// Set the new position of the current vertex.
 		vec3 newposition = vec3(position.x, newypos, position.z);
+
+		// Multiply with the projection and model matrices.
 		vec4 mvPosition = modelViewMatrix * vec4( newposition, 1.0 );
 		gl_Position = projectionMatrix * mvPosition;
 	}
 </script>
+
+<!-- Fragment Shader. -->
 <script id="fragmentShader" type="x-shader/x-vertex">
-	varying vec3 color;
+	varying vec3 color;					// The color sent in from the vertex shader.
 	void main()
 	{
+		// Set the color of the current fragment to the color computed in the vertex shader.
 		gl_FragColor = vec4( color, 1.0 );
 	}
 </script>
+
+<!-- Included files. -->
+<!-- 
+	jQuery for convenient selecting of html elements, 
+	rangeslider for the UI elements, 
+	three.js for data structures, 
+	OrbitControls for mouse controls,
+	main.js is our main file that we've coded. 
+-->
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/rangeslider.min.js"></script>
 <script>
+	// Initialize all of the sliders in the UI.
 	$('input[type="range"]').rangeslider({
 		polyfill: false
 	});
